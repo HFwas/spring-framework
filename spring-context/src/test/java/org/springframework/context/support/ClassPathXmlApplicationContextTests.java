@@ -74,8 +74,11 @@ public class ClassPathXmlApplicationContextTests {
 
 	@Test
 	public void testSingleConfigLocation() {
+		// 创建spring容器
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(FQ_SIMPLE_CONTEXT);
+		// 判断spring容器 someMessageSource 是否存在
 		assertTrue(ctx.containsBean("someMessageSource"));
+		// 关闭Spring容器
 		ctx.close();
 	}
 

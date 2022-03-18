@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
+ * 对EnvironmentCapable、BeanDefinitionReader类定义的功能进行实现。
  * Abstract base class for bean definition readers which implement
  * the {@link BeanDefinitionReader} interface.
  *

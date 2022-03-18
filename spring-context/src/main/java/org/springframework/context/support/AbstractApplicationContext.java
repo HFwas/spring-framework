@@ -578,13 +578,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 准备刷新的上下文， 设置开始时间和活跃表示标识，以及执行任何属性源的初始化
 	 * Prepare this context for refreshing, setting its startup date and
 	 * active flag as well as performing any initialization of property sources.
 	 */
 	protected void prepareRefresh() {
 		// Switch to active.
+		// 设置开始时间
 		this.startupDate = System.currentTimeMillis();
+		//
 		this.closed.set(false);
+		// 活跃状态开启 ->
 		this.active.set(true);
 
 		if (logger.isDebugEnabled()) {
@@ -597,6 +601,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment.
+		// 在上下文环境当中，初始化任何的属性源
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
@@ -619,6 +624,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 用实际实例替换任何存根属性源 ->
 	 * <p>Replace any stub property sources with actual instances.
 	 * @see org.springframework.core.env.PropertySource.StubPropertySource
 	 * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources
