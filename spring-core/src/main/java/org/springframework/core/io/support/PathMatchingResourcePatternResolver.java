@@ -200,9 +200,10 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 		}
 	}
 
-
+	// 资源加载器
 	private final ResourceLoader resourceLoader;
 
+	// 路径匹配器
 	private PathMatcher pathMatcher = new AntPathMatcher();
 
 
@@ -252,6 +253,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	}
 
 	/**
+	 * 默认的资源解析器是 AntPathMatcher.
 	 * Set the PathMatcher implementation to use for this
 	 * resource pattern resolver. Default is AntPathMatcher.
 	 * @see org.springframework.util.AntPathMatcher
@@ -277,26 +279,33 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	@Override
 	public Resource[] getResources(String locationPattern) throws IOException {
 		Assert.notNull(locationPattern, "Location pattern must not be null");
+		// 如果路径以 classpath*: 开头，
 		if (locationPattern.startsWith(CLASSPATH_ALL_URL_PREFIX)) {
+			// 路径包含通配符
 			// a class path resource (multiple resources for same name possible)
 			if (getPathMatcher().isPattern(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()))) {
 				// a class path resource pattern
 				return findPathMatchingResources(locationPattern);
 			}
+			// 路径不包含通配符
 			else {
 				// all class path resources with the given name
 				return findAllClassPathResources(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()));
 			}
 		}
+		// 不以 classpath*: 开头，
 		else {
+			//
 			// Generally only look for a pattern after a prefix here,
 			// and on Tomcat only after the "*/" separator for its "war:" protocol.
 			int prefixEnd = (locationPattern.startsWith("war:") ? locationPattern.indexOf("*/") + 1 :
 					locationPattern.indexOf(':') + 1);
+			// 路径包含通配符
 			if (getPathMatcher().isPattern(locationPattern.substring(prefixEnd))) {
 				// a file pattern
 				return findPathMatchingResources(locationPattern);
 			}
+			// 路径不包含通配符
 			else {
 				// a single resource with the given name
 				return new Resource[] {getResourceLoader().getResource(locationPattern)};
@@ -315,9 +324,11 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 */
 	protected Resource[] findAllClassPathResources(String location) throws IOException {
 		String path = location;
+		// 如果以 / 开头
 		if (path.startsWith("/")) {
 			path = path.substring(1);
 		}
+		// 真正执行的逻辑
 		Set<Resource> result = doFindAllClassPathResources(path);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Resolved classpath location [" + location + "] to resources " + result);
@@ -326,6 +337,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	}
 
 	/**
+	 * 通过指定路径， 发现所有的资源
 	 * Find all class location resources with the given path via the ClassLoader.
 	 * Called by {@link #findAllClassPathResources(String)}.
 	 * @param path the absolute path within the classpath (never a leading slash)
@@ -334,13 +346,19 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 */
 	protected Set<Resource> doFindAllClassPathResources(String path) throws IOException {
 		Set<Resource> result = new LinkedHashSet<>(16);
+		// 获取类加载器
 		ClassLoader cl = getClassLoader();
+		// 如果类加载器不为空，通过类加载获取指定路径下的资源集合，
+		// 如果类加载器为空， 通过系统类类加载器获取指定路径下的资源集合
 		Enumeration<URL> resourceUrls = (cl != null ? cl.getResources(path) : ClassLoader.getSystemResources(path));
 		while (resourceUrls.hasMoreElements()) {
 			URL url = resourceUrls.nextElement();
+			// 将 url 转换为 UrlResource
+			// 通过设置 url , uri 属性
 			result.add(convertClassLoaderURL(url));
 		}
 		if ("".equals(path)) {
+			// 加载路径下所有的 jar 包
 			// The above result is likely to be incomplete, i.e. only containing file system references.
 			// We need to have pointers to each of the jar files on the classpath as well...
 			addAllClassLoaderJarRoots(cl, result);
@@ -368,10 +386,14 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * @since 4.1.1
 	 */
 	protected void addAllClassLoaderJarRoots(@Nullable ClassLoader classLoader, Set<Resource> result) {
+		// 如果 类加载器是 URLClassLoader 类型的
 		if (classLoader instanceof URLClassLoader) {
 			try {
+				// 编辑 URL 集合
 				for (URL url : ((URLClassLoader) classLoader).getURLs()) {
 					try {
+						// 如果是 url 协议， 返回 UrlResource url : url
+						// 不是， 则返回 url : jar : url : !/
 						UrlResource jarResource = (ResourceUtils.URL_PROTOCOL_JAR.equals(url.getProtocol()) ?
 								new UrlResource(url) :
 								new UrlResource(ResourceUtils.JAR_URL_PREFIX + url + ResourceUtils.JAR_URL_SEPARATOR));

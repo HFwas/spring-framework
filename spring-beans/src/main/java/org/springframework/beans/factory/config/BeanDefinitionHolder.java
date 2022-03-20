@@ -57,6 +57,7 @@ public class BeanDefinitionHolder implements BeanMetadataElement {
 	}
 
 	/**
+	 * BeanDefinitionHolder 属性的填充
 	 * Create a new BeanDefinitionHolder.
 	 * @param beanDefinition the BeanDefinition to wrap
 	 * @param beanName the name of the bean, as specified for the bean definition
