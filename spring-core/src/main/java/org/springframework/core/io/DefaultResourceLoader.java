@@ -16,6 +16,12 @@
 
 package org.springframework.core.io;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ResourceUtils;
+import org.springframework.util.StringUtils;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -23,12 +29,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ResourceUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * ResourceLoader 接口的默认实现
@@ -159,6 +159,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 
 		// 以 / 开头， 则返回 ClassPathContextResource 对象
 		if (location.startsWith("/")) {
+			// 示例： /org/springframework/context/support/simpleContext.xml
 			return getResourceByPath(location);
 		}
 		// 如果以 classpath: 开头， 返回 ClassPathResource 对象
@@ -181,6 +182,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 	}
 
 	/**
+	 * 清洗 类路径 ， 设置 类加载器
 	 * Return a Resource handle for the resource at the given path.
 	 * <p>The default implementation supports class path locations. This should
 	 * be appropriate for standalone implementations but can be overridden,

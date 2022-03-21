@@ -73,6 +73,7 @@ public class DefaultDocumentLoader implements DocumentLoader {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Using JAXP provider [" + factory.getClass().getName() + "]");
 		}
+		// 创建一个带有实体解析器和错误处理器的 DocumentBuilder 对象
 		DocumentBuilder builder = createDocumentBuilder(factory, entityResolver, errorHandler);
 		return builder.parse(inputSource);
 	}
@@ -92,7 +93,9 @@ public class DefaultDocumentLoader implements DocumentLoader {
 		factory.setNamespaceAware(namespaceAware);
 
 		if (validationMode != XmlValidationModeDetector.VALIDATION_NONE) {
+			// 设置校验状态
 			factory.setValidating(true);
+			// 是否是 XSD 校验
 			if (validationMode == XmlValidationModeDetector.VALIDATION_XSD) {
 				// Enforce namespace aware for XSD...
 				factory.setNamespaceAware(true);
@@ -127,11 +130,13 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	protected DocumentBuilder createDocumentBuilder(DocumentBuilderFactory factory,
 			@Nullable EntityResolver entityResolver, @Nullable ErrorHandler errorHandler)
 			throws ParserConfigurationException {
-
+		// 通过 DocumentBuilderFactory ，创建一个 DocumentBuilder 实例，
 		DocumentBuilder docBuilder = factory.newDocumentBuilder();
+		// 设置实体解析器
 		if (entityResolver != null) {
 			docBuilder.setEntityResolver(entityResolver);
 		}
+		// 设置错误处理器
 		if (errorHandler != null) {
 			docBuilder.setErrorHandler(errorHandler);
 		}

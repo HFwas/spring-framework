@@ -453,6 +453,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 */
 	protected int getValidationModeForResource(Resource resource) {
 		int validationModeToUse = getValidationMode();
+		//
 		if (validationModeToUse != VALIDATION_AUTO) {
 			return validationModeToUse;
 		}
@@ -463,6 +464,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		// Hmm, we didn't get a clear indication... Let's assume XSD,
 		// since apparently no DTD declaration has been found up until
 		// detection stopped (before finding the document's root tag).
+		// XSD 校验模式
 		return VALIDATION_XSD;
 	}
 
