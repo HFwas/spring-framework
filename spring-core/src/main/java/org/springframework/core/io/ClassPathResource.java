@@ -117,6 +117,7 @@ public class ClassPathResource extends AbstractFileResolvingResource {
 
 
 	/**
+	 *
 	 * Return the path for this resource (as resource path within the class path).
 	 */
 	public final String getPath() {
