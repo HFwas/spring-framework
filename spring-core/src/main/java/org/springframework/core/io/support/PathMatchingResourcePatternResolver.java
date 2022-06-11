@@ -181,7 +181,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	// 资源加载器
 	private final ResourceLoader resourceLoader;
 
-	// 路径匹配器, 支持ANT格式风格的匹配
+	// 路径匹配器, 默认是 ANT 格式风格的匹配
 	private PathMatcher pathMatcher = new AntPathMatcher();
 
 
@@ -259,7 +259,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 		Assert.notNull(locationPattern, "Location pattern must not be null");
 		// 如果路径以 classpath*: 开头，
 		if (locationPattern.startsWith(CLASSPATH_ALL_URL_PREFIX)) {
-			// 路径包含通配符
+			// 路径包含通配符 classpath*:
 			// a class path resource (multiple resources for same name possible)
 			if (getPathMatcher().isPattern(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()))) {
 				// a class path resource pattern
@@ -493,13 +493,19 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * @see org.springframework.util.PathMatcher
 	 */
 	protected Resource[] findPathMatchingResources(String locationPattern) throws IOException {
+		// 找到 路径 的根目录
 		String rootDirPath = determineRootDir(locationPattern);
+		// 找到 子路径
 		String subPattern = locationPattern.substring(rootDirPath.length());
+		// 获取根路径下的所有资源
 		Resource[] rootDirResources = getResources(rootDirPath);
 		Set<Resource> result = new LinkedHashSet<>(16);
+		// 遍历根路径下的资源列表
 		for (Resource rootDirResource : rootDirResources) {
+			//
 			rootDirResource = resolveRootDirResource(rootDirResource);
 			URL rootDirUrl = rootDirResource.getURL();
+			// bundle 类型
 			if (equinoxResolveMethod != null && rootDirUrl.getProtocol().startsWith("bundle")) {
 				URL resolvedUrl = (URL) ReflectionUtils.invokeMethod(equinoxResolveMethod, null, rootDirUrl);
 				if (resolvedUrl != null) {
@@ -507,12 +513,15 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 				}
 				rootDirResource = new UrlResource(rootDirUrl);
 			}
+			// vfs类型
 			if (rootDirUrl.getProtocol().startsWith(ResourceUtils.URL_PROTOCOL_VFS)) {
 				result.addAll(VfsResourceMatchingDelegate.findMatchingResources(rootDirUrl, subPattern, getPathMatcher()));
 			}
+			// jar类型
 			else if (ResourceUtils.isJarURL(rootDirUrl) || isJarResource(rootDirResource)) {
 				result.addAll(doFindPathMatchingJarResources(rootDirResource, rootDirUrl, subPattern));
 			}
+			// 其他类型
 			else {
 				result.addAll(doFindPathMatchingFileResources(rootDirResource, subPattern));
 			}
@@ -536,14 +545,18 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * @see #retrieveMatchingFiles
 	 */
 	protected String determineRootDir(String location) {
+		// 确定 冒号 后一位
 		int prefixEnd = location.indexOf(':') + 1;
+		// 确定 根目录路径长度，结束位置
 		int rootDirEnd = location.length();
+		// 判断路径当中是否有通配符的存在，有则截断由最后一个/分割的路径
 		while (rootDirEnd > prefixEnd && getPathMatcher().isPattern(location.substring(prefixEnd, rootDirEnd))) {
 			rootDirEnd = location.lastIndexOf('/', rootDirEnd - 2) + 1;
 		}
 		if (rootDirEnd == 0) {
 			rootDirEnd = prefixEnd;
 		}
+		// 截取根目录
 		return location.substring(0, rootDirEnd);
 	}
 
