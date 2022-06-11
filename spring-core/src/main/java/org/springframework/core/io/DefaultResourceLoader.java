@@ -52,7 +52,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 	@Nullable
 	private ClassLoader classLoader;
 
-	// 协议解析器
+	// 协议解析器,
 	private final Set<ProtocolResolver> protocolResolvers = new LinkedHashSet<>(4);
 
 	// 资源缓存
@@ -150,6 +150,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 	public Resource getResource(String location) {
 		Assert.notNull(location, "Location must not be null");
 
+		// 业务系统实现了 ProtocolResolver ， 那么直接使用自定义的 ProtocolResolver 去解析指定路径下的文件
 		for (ProtocolResolver protocolResolver : getProtocolResolvers()) {
 			Resource resource = protocolResolver.resolve(location, this);
 			if (resource != null) {
@@ -157,6 +158,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 			}
 		}
 
+		// 业务系统没有实现 ProtocolResolver 接口
 		// 以 / 开头， 则返回 ClassPathContextResource 对象
 		if (location.startsWith("/")) {
 			// 示例： /org/springframework/context/support/simpleContext.xml

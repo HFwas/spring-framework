@@ -586,7 +586,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Switch to active.
 		// 设置开始时间
 		this.startupDate = System.currentTimeMillis();
-		//
+		// 设置关闭状态
 		this.closed.set(false);
 		// 活跃状态开启 ->
 		this.active.set(true);
@@ -1287,6 +1287,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	@Nullable
 	protected BeanFactory getInternalParentBeanFactory() {
+		//
 		return (getParent() instanceof ConfigurableApplicationContext ?
 				((ConfigurableApplicationContext) getParent()).getBeanFactory() : getParent());
 	}

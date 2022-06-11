@@ -191,11 +191,12 @@ public abstract class ClassUtils {
 			// Cannot access thread context ClassLoader - falling back...
 		}
 		if (cl == null) {
-			// 没有 线程上下文环境，使用本类的类加载器
+			// 获取当前类的类加载器
 			// No thread context class loader -> use class loader of this class.
 			cl = ClassUtils.class.getClassLoader();
+			// 当前类类加载器不存在
 			if (cl == null) {
-				// 本类加载器也没有， 使用系统类加载器
+				// 本类加载器也没有， 获取系统类加载器
 				// getClassLoader() returning null indicates the bootstrap ClassLoader
 				try {
 					cl = ClassLoader.getSystemClassLoader();
