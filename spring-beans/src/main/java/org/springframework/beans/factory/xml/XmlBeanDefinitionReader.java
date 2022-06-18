@@ -452,6 +452,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see #detectValidationMode
 	 */
 	protected int getValidationModeForResource(Resource resource) {
+		// 默认是 VALIDATION_AUTO 值为1
 		int validationModeToUse = getValidationMode();
 		//
 		if (validationModeToUse != VALIDATION_AUTO) {
@@ -476,6 +477,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * of the {@link #VALIDATION_AUTO} mode.
 	 */
 	protected int detectValidationMode(Resource resource) {
+		// 资源是否打开了， 否则抛出BeanDefinitionStoreException
 		if (resource.isOpen()) {
 			throw new BeanDefinitionStoreException(
 					"Passed-in Resource [" + resource + "] contains an open stream: " +
@@ -484,6 +486,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 					"on your XmlBeanDefinitionReader instance.");
 		}
 
+		// 获取资源的 InputStream
 		InputStream inputStream;
 		try {
 			inputStream = resource.getInputStream();
@@ -496,6 +499,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		}
 
 		try {
+			//
 			return this.validationModeDetector.detectValidationMode(inputStream);
 		}
 		catch (IOException ex) {
@@ -518,9 +522,13 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see BeanDefinitionDocumentReader#registerBeanDefinitions
 	 */
 	public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
+		// 创建 BeanDefinitionDocumentReader 对象
 		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
+		// 获取已经注册到 BeanDefinitionRegistry 当中中的 bean 数量
 		int countBefore = getRegistry().getBeanDefinitionCount();
+		//
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
+		// 获取当前 BeanDefinitionRegistry 当中的 bean 数量 -  已经注册过的bean
 		return getRegistry().getBeanDefinitionCount() - countBefore;
 	}
 
